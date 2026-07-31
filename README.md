@@ -1,8 +1,7 @@
 # Ulta Analysis
 
 This project collects public Ulta product, variant, price, image, and ingredient
-data into reproducible raw snapshots. It is Ulta-only: no Sephora or financial
-data belongs in this repository.
+data into reproducible raw snapshots.
 
 ## Install
 
