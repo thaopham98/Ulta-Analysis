@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+.env
+*.tmp
+
+# Scrape outputs can be large and are reproducible. Keep directory documentation.
+data/raw/*/*/
+!data/raw/.gitkeep

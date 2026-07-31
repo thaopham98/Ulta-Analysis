@@ -1,0 +1,7 @@
+category,rows,unique_products,file
+palettes_no_swatch_image,17,17,../data/processed_data/test/blushes\palettes_no_swatch_image.csv
+palettes_with_swatch_image,35,9,../data/processed_data/test/blushes\palettes_with_swatch_image.csv
+multi_color_swatch_image,168,35,../data/processed_data/test/blushes\multi_color_swatch_image.csv
+single_color_no_swatch_image,13,13,../data/processed_data/test/blushes\single_color_no_swatch_image.csv
+single_color_swatch_image,1365,234,../data/processed_data/test/blushes\single_color_swatch_image.csv
+set_blush,65,27,../data/processed_data/test/blushes\set_blush.csv

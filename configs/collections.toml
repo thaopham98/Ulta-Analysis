@@ -1,0 +1,31 @@
+[collections.blush]
+source_url = "https://www.ulta.com/shop/makeup/face/blush"
+source_type = "listing"
+
+[collections.bronzer]
+source_url = "https://www.ulta.com/shop/makeup/face/bronzer"
+source_type = "listing"
+
+[collections.tinted_moisturizer]
+source_url = "https://www.ulta.com/shop/skin-care/moisturizers/tinted-moisturizer"
+source_type = "listing"
+
+[collections.face_moisturizer]
+source_url = "https://www.ulta.com/shop/skin-care/moisturizers/face-moisturizer"
+source_type = "listing"
+
+[collections.moisturizers]
+source_url = "https://www.ulta.com/shop/skin-care/moisturizers"
+source_type = "listing"
+
+[collections.bath_shower]
+source_url = "https://www.ulta.com/shop/body-care/bath-shower"
+source_type = "listing"
+
+[collections.shampoo]
+source_url = "https://www.ulta.com/shop/hair/shampoo-conditioner/shampoo"
+source_type = "listing"
+
+[collections.curl_talk_shampoo]
+source_url = "https://www.ulta.com/p/curl-talk-clean-slate-daily-shampoo-pimprod2058990?sku=2659098"
+source_type = "product"

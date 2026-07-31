@@ -1,0 +1,7 @@
+[scraper]
+request_delay_seconds = 1.0
+checkpoint_interval = 25
+max_pages = 100
+timeout_seconds = 20
+max_retries = 3
+user_agent = "UltaAnalysisResearch/0.2 (+personal market research; respectful request rate)"
