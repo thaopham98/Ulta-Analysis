@@ -2,6 +2,30 @@
 
 All material workspace changes are recorded here for future review.
 
+## 2026-07-31 — Resumable swatch color measurement
+
+### Added
+
+- A dedicated `ulta_analysis.colors` package and `extract_swatch_colors.py`
+  entry point.
+- Center-crop median RGB extraction with transparent/near-white background
+  handling, derived HEX, and sRGB-to-CIE-Lab conversion under D65.
+- Image hashes, dimensions, sampled-pixel counts, RGB spread, atomic
+  checkpoints, failure logs, and run manifests.
+- Tests against prior cached Lab values, solid swatches, white backgrounds, and
+  resume behavior.
+
+### Prior-project review
+
+- `Ulta_Project` contained the strongest reusable implementation: center 20%
+  crop, channel-wise median RGB, and Lab conversion.
+- `new_ulta_v2` added near-white background rejection but mixed color
+  extraction with text repair, product exclusions, and destructive row drops.
+- `ulta_pigments` stored two dominant HEX values and seasonal labels but did
+  not provide a clean reproducible extraction stage.
+- `Ulta` converted extracted RGB values to Lab for clustering, but clustering
+  remains a later analysis stage and was not copied into collection code.
+
 ## 2026-07-23 — Ingredient-focused normalized raw schema
 
 ### Changed
