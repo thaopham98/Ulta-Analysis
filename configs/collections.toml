@@ -29,3 +29,7 @@ source_type = "listing"
 [collections.curl_talk_shampoo]
 source_url = "https://www.ulta.com/p/curl-talk-clean-slate-daily-shampoo-pimprod2058990?sku=2659098"
 source_type = "product"
+
+[collections.foundation]
+source_url = "https://www.ulta.com/shop/makeup/face/foundation"
+source_type = "listing"
