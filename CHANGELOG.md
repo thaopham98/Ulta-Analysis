@@ -2,6 +2,21 @@
 
 All material workspace changes are recorded here for future review.
 
+## 2026-08-03 — Feature 1 interactive color-space map
+
+### Added
+
+- A standalone Plotly HTML generator that joins cleaned product details to
+  swatch colors by unique `sku_id`.
+- Deterministic LCh hue-angle and Lab-lightness positioning for 1,363 blush
+  shades; no clustering or machine learning is used for coordinates.
+- Hover details and a click-pinned panel with product/swatch images, pricing,
+  normalized unit price, and Ulta links.
+- Strict one-to-one SKU join validation and automated report tests.
+
+The report is deliberately serverless for the first feature. A Dash application
+can reuse the figure later when recommendations and filters are implemented.
+
 ## 2026-07-31 — Resumable swatch color measurement
 
 ### Added

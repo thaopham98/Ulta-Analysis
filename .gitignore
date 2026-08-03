@@ -13,3 +13,6 @@ data/raw/*/*/
 # Reproducible image-derived caches.
 data/interim/**
 !data/interim/.gitkeep
+
+# Generated interactive reports are rebuilt from processed data.
+reports/interactive/*.html

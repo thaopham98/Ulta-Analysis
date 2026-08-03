@@ -155,6 +155,33 @@ These values describe Ulta's digital swatch artwork. They do not directly
 measure the physical cosmetic, its pigment formula, lighting behavior, or its
 appearance on different skin tones.
 
+## Interactive blush color map
+
+Feature 1 is generated as a self-contained HTML report. It needs no database,
+GPU, web server, or Conda-specific setup; the project `.venv` and any modern
+browser are sufficient.
+
+```powershell
+python scripts/build_color_map.py `
+  --variants "data/processed_data/test/blushes/cleaned/cleaned_single_blush.csv" `
+  --colors "data/interim/blush/swatch_colors.csv" `
+  --output "reports/interactive/blush-color-map.html"
+```
+
+The X coordinate is LCh hue angle across the blush-relevant
+magenta/purple-to-coral/orange arc. The Y coordinate is Lab `L*` lightness.
+These positions are calculated directly from color space; no machine learning
+is involved. Hover shows brand, product, variant, price, size, unit price, hue,
+lightness, and chroma. Clicking pins product and swatch images plus the Ulta link
+in a details panel.
+
+Generated HTML reports are ignored by Git because they embed Plotly and can be
+rebuilt from the CSV inputs. The same Plotly figure can later move into Dash
+when color clustering, nearest-shade selection, and ingredient filters require
+server-backed interactions.
+
+![Feature 1: Color Map](images\feature_1_color_map.png)
+
 ## Encoding policy
 
 Ulta names and ingredients may contain French, Italian, and other non-ASCII
