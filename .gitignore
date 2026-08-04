@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 .env
 *.tmp
+*.log
 
 # Scrape outputs can be large and are reproducible. Keep directory documentation.
 data/raw/*/*/
@@ -15,4 +16,4 @@ data/interim/**
 !data/interim/.gitkeep
 
 # Generated interactive reports are rebuilt from processed data.
-reports/interactive/*.html
+# reports/interactive/*.html
