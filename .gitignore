@@ -5,6 +5,7 @@ __pycache__/
 *.egg-info/
 .env
 *.tmp
+*.log
 
 # Scrape outputs can be large and are reproducible. Keep directory documentation.
 data/raw/*/*/
