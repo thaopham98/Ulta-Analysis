@@ -15,4 +15,4 @@ data/interim/**
 !data/interim/.gitkeep
 
 # Generated interactive reports are rebuilt from processed data.
-reports/interactive/*.html
+# reports/interactive/*.html
