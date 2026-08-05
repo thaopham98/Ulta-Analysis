@@ -91,9 +91,8 @@ def parse_load_more_url(html: str, page_url: str) -> str | None:
             return urljoin(page_url, href)
     return None
 
-
-def _ingredients_from_apollo_state(html: str) -> str | None:
-    """Extract the first ingredient list from Ulta's embedded Apollo state."""
+def _apollo_state(html: str):
+    """Decode Ulta's embedded Apollo state once."""
     marker = "window.__APOLLO_STATE__"
     marker_start = html.find(marker)
     if marker_start == -1:
@@ -101,18 +100,24 @@ def _ingredients_from_apollo_state(html: str) -> str | None:
 
     json_start = html.find("{", marker_start + len(marker))
     if json_start == -1:
-        return None 
+        return None
 
     try:
         state, _ = json.JSONDecoder().raw_decode(html[json_start:])
     except json.JSONDecodeError:
         return None
 
+    return state
+
+
+def _ingredients_from_apollo_state(state) -> str | None:
+    if state is None:
+        return None
+
     for value in _find_ingredient_strings(state):
         ingredients = _optional_text(value)
-        ingredients = ingredients.replace(r"\[", "[").replace(r"\]", "]")   
         if ingredients:
-            return ingredients
+            return ingredients.replace(r"\[", "[").replace(r"\]", "]")
 
     return None
 
@@ -131,11 +136,59 @@ def _find_ingredient_strings(value):
             yield from _find_ingredient_strings(child)
 
 
+def _size_from_apollo_state(state, sku_id: str) -> str | None:
+    """Find the product size, preferring the component for the requested SKU."""
+    if state is None:
+        return None
+
+    fallback_sizes: list[str] = []
+
+    for entry in _find_dimension_entries(state):
+        label = _optional_text(entry.get("dimensionsLabel"))
+        size = _optional_text(entry.get("dimensionsValue"))
+
+        if not label or label.casefold() != "size" or not size:
+            continue
+
+        variants = entry.get("variants")
+        if isinstance(variants, list):
+            for variant in variants:
+                if not isinstance(variant, dict):
+                    continue
+
+                variant_sku = str(
+                    variant.get("skuId")
+                    or variant.get("sku")
+                    or ""
+                )
+
+                if variant_sku == sku_id and variant.get("selected") is True:
+                    return size
+
+        fallback_sizes.append(size)
+
+    return fallback_sizes[0] if fallback_sizes else None
+
+
+def _find_dimension_entries(value):
+    if isinstance(value, dict):
+        if "dimensionsLabel" in value and "dimensionsValue" in value:
+            yield value
+
+        for child in value.values():
+            yield from _find_dimension_entries(child)
+
+    elif isinstance(value, list):
+        for child in value:
+            yield from _find_dimension_entries(child)
+
+
 def parse_product_page(
     html: str,
     source_url: str,
 ) -> ParsedProduct:
     soup = BeautifulSoup(html, "html.parser")
+    apollo_state = _apollo_state(html)
     schema = _find_product_schema(soup)
     if schema is None:
         raise ParseError("Product JSON-LD was not found")
@@ -194,7 +247,10 @@ def parse_product_page(
             f"?img404={sku_id}&w=400&fmt=auto"
         )
 
-    ingredients = _ingredients_from_apollo_state(html) or _ingredients(soup)
+    ingredients = (
+        _ingredients_from_apollo_state(apollo_state)
+        or _ingredients(soup)
+    )
     ingredient_set_id = (
         hashlib.sha256(
             f"{product_id}\0{ingredients}".encode("utf-8", errors="strict")
@@ -219,7 +275,7 @@ def parse_product_page(
         variant_url=variant_url,
         list_price=list_price,
         sale_price=sale_price,
-        size_text=_parse_size(soup),
+        size_text=( _size_from_apollo_state(apollo_state, sku_id) or _parse_size(soup) ),
         availability=_availability(offer.get("availability")),
         swatch_image_url=swatch_image_url,
         variant_image_url=_image_url(schema.get("image")),
@@ -332,7 +388,7 @@ def _parse_size(soup: BeautifulSoup) -> str | None:
         return None
     text = dimension.get_text(" ", strip=True)
     match = re.search(r"\bSize:\s*(.+)$", text, re.IGNORECASE)
-    return match.group(1).strip() if match else text or None
+    return match.group(1).strip() if match else None
 
 
 def _variant_urls(soup: BeautifulSoup, source_url: str) -> list[str]:

@@ -1,5 +1,5 @@
 from IPython.display import HTML, display
-
+import pandas as pd
 
 def show_swatches(dataset, start: int = 0, stop: int = 20, variants_df=None):
     # Convert pandas DataFrame / Series / list-like -> list[dict]

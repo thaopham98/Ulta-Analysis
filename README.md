@@ -52,7 +52,8 @@ python scripts/scrape_ulta.py --collection shampoo --max-products 5
 
 A one-off Ulta listing or product URL is also supported. Shared scraper settings
 still come from `scraper.toml`:
-- `name` is the output collection/folder name, not the product's display name. It must be a lowercase slug such as "bath_shower"
+- `url`: the URL of the product.
+- `name`: the output collection/folder name, not the product's display name. It must be a lowercase slug such as "bath_shower" or "blush".
 
 ```powershell
 python scripts/scrape_ulta.py `
