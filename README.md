@@ -1,7 +1,18 @@
-# Ulta Analysis
+# Ulta Beauty Product Data & Cosmetic Swatch Color Analysis
 
-This project collects public Ulta product, variant, price, image, and ingredient
-data into reproducible raw snapshots.
+An end-to-end Python data engineering and image-processing project for
+collecting, preparing, and analyzing cosmetic product data from Ulta Beauty.
+
+The project builds reproducible product, variant, price, ingredient, and image datasets; classifies blush products by format; cleans product size and pricing data; and extracts representative sRGB, HEX, and CIE L*a*b* color measurements from digital makeup swatch images.
+
+## What This Project Demonstrates
+- ETL and normalized product-data pipelines
+- Retail and e-commerce product analytics
+- Data cleaning, validation, and feature engineering
+- Cosmetic swatch image processing
+- sRGB, HEX, and CIE L*a*b* color science
+- Reproducible datasets, manifests, checksums, and checkpoints
+- Python packaging, command-line interfaces, and automated testing
 
 ## Install
 
