@@ -1,4 +1,4 @@
-# Ulta Analysis
+# Ulta Beauty Product Data & Cosmetic Swatch Color Analysis
 
 This project collects public Ulta product, variant, price, image, and ingredient
 data into reproducible raw snapshots.
