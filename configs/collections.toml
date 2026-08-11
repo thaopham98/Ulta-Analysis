@@ -33,3 +33,7 @@ source_type = "product"
 [collections.foundation]
 source_url = "https://www.ulta.com/shop/makeup/face/foundation"
 source_type = "listing"
+
+[colleections.sunscreen]
+source_url = "https://www.ulta.com/shop/body-care/suncare/sunscreen"
+source_type = "listing"
