@@ -9,3 +9,10 @@ __pycache__/
 # Scrape outputs can be large and are reproducible. Keep directory documentation.
 data/raw/*/*/
 !data/raw/.gitkeep
+
+# Reproducible image-derived caches.
+data/interim/**
+!data/interim/.gitkeep
+
+# Generated interactive reports are rebuilt from processed data.
+reports/interactive/*.html

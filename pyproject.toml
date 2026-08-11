@@ -5,16 +5,20 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ulta-analysis"
 version = "0.1.0"
-description = "Reproducible Ulta product, variant, and ingredient collection"
+description = "Reproducible Ulta collection and color analysis"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
   "beautifulsoup4>=4.12,<5",
+  "Pillow>=10,<13",
+  "plotly>=6,<7",
   "requests>=2.31,<3",
 ]
 
 [project.scripts]
 ulta-scrape = "ulta_analysis.scraping.cli:main"
+ulta-colors = "ulta_analysis.colors.cli:main"
+ulta-color-map = "ulta_analysis.visualization.color_map:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

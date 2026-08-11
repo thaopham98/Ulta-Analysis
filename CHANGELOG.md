@@ -2,6 +2,45 @@
 
 All material workspace changes are recorded here for future review.
 
+## 2026-08-03 — Feature 1 interactive color-space map
+
+### Added
+
+- A standalone Plotly HTML generator that joins cleaned product details to
+  swatch colors by unique `sku_id`.
+- Deterministic LCh hue-angle and Lab-lightness positioning for 1,363 blush
+  shades; no clustering or machine learning is used for coordinates.
+- Hover details and a click-pinned panel with product/swatch images, pricing,
+  normalized unit price, and Ulta links.
+- Strict one-to-one SKU join validation and automated report tests.
+
+The report is deliberately serverless for the first feature. A Dash application
+can reuse the figure later when recommendations and filters are implemented.
+
+## 2026-07-31 — Resumable swatch color measurement
+
+### Added
+
+- A dedicated `ulta_analysis.colors` package and `extract_swatch_colors.py`
+  entry point.
+- Center-crop median RGB extraction with transparent/near-white background
+  handling, derived HEX, and sRGB-to-CIE-Lab conversion under D65.
+- Image hashes, dimensions, sampled-pixel counts, RGB spread, atomic
+  checkpoints, failure logs, and run manifests.
+- Tests against prior cached Lab values, solid swatches, white backgrounds, and
+  resume behavior.
+
+### Prior-project review
+
+- `Ulta_Project` contained the strongest reusable implementation: center 20%
+  crop, channel-wise median RGB, and Lab conversion.
+- `new_ulta_v2` added near-white background rejection but mixed color
+  extraction with text repair, product exclusions, and destructive row drops.
+- `ulta_pigments` stored two dominant HEX values and seasonal labels but did
+  not provide a clean reproducible extraction stage.
+- `Ulta` converted extracted RGB values to Lab for clustering, but clustering
+  remains a later analysis stage and was not copied into collection code.
+
 ## 2026-07-23 — Ingredient-focused normalized raw schema
 
 ### Changed

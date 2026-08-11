@@ -116,6 +116,83 @@ is retained. Row-level `observed_at` is not used: the run's `started_at` and
 `variant_without_ingredients_count` in the manifest makes missing ingredient
 content visible instead of silently pretending it was collected.
 
+## Swatch color extraction
+
+Color extraction is a separate, resumable processing stage. It does not change
+the scraped or prepared variant dataset. The current blush input contains 1,365
+unique color SKUs with 1,365 unique Ulta swatch-image URLs:
+
+```text
+data/processed_data/test/blushes/single_color_swatch_image.csv
+```
+
+Start with a five-row verification run:
+
+```powershell
+python scripts/extract_swatch_colors.py `
+  --input "data/processed_data/test/blushes/single_color_swatch_image.csv" `
+  --output "data/interim/blush/swatch_colors_sample.csv" `
+  --limit 5
+```
+
+Then use a new output path for the complete dataset:
+
+```powershell
+python scripts/extract_swatch_colors.py `
+  --input "data/processed_data/test/blushes/single_color_swatch_image.csv" `
+  --output "data/interim/blush/swatch_colors.csv"
+```
+
+The command checkpoints every 25 attempted images and resumes from an existing
+output. Each output row is keyed by `product_id`, `sku_id`, and
+`swatch_image_url` and includes:
+
+- median center-crop RGB and a derived HEX display value;
+- CIE L*a*b* coordinates under the D65 reference white;
+- source-image SHA-256 and dimensions;
+- sampled-pixel count and `rgb_spread` for quality review; and
+- the versioned extraction method, `center_median_srgb_v1`.
+
+The failure CSV is an attempt log, so a temporary failure remains recorded even
+after a later resume succeeds. Use `unresolved_row_count` in the manifest to
+determine whether any swatches are still missing.
+
+The center crop, background rejection, and median estimator come from the most
+reliable versions in the earlier Ulta projects. Manual color patches and product
+exclusions are intentionally not embedded in this measurement layer. Corrections
+should be a separate, auditable cleaning table.
+
+These values describe Ulta's digital swatch artwork. They do not directly
+measure the physical cosmetic, its pigment formula, lighting behavior, or its
+appearance on different skin tones.
+
+## Interactive blush color map
+
+Feature 1 is generated as a self-contained HTML report. It needs no database,
+GPU, web server, or Conda-specific setup; the project `.venv` and any modern
+browser are sufficient.
+
+```powershell
+python scripts/build_color_map.py `
+  --variants "data/processed_data/test/blushes/cleaned/cleaned_single_blush.csv" `
+  --colors "data/interim/blush/swatch_colors.csv" `
+  --output "reports/interactive/blush-color-map.html"
+```
+
+The X coordinate is LCh hue angle across the blush-relevant
+magenta/purple-to-coral/orange arc. The Y coordinate is Lab `L*` lightness.
+These positions are calculated directly from color space; no machine learning
+is involved. Hover shows brand, product, variant, price, size, unit price, hue,
+lightness, and chroma. Clicking pins product and swatch images plus the Ulta link
+in a details panel.
+
+Generated HTML reports are ignored by Git because they embed Plotly and can be
+rebuilt from the CSV inputs. The same Plotly figure can later move into Dash
+when color clustering, nearest-shade selection, and ingredient filters require
+server-backed interactions.
+
+![Feature 1: Color Map](images/feature_1_color_map.png)
+
 ## Encoding policy
 
 Ulta names and ingredients may contain French, Italian, and other non-ASCII

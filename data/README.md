@@ -19,8 +19,12 @@ SKU to its formula with `ingredient_set_id`.
 
 Future pipeline stages should use:
 
-- `interim/` for resumable caches and normalized-but-not-final data;
+- `interim/` for resumable caches such as `swatch_colors.csv` and its manifest;
 - `processed/` for validated analysis-ready tables.
+
+Swatch colors remain separate from the prepared variant table and join through
+`sku_id`. This avoids duplicating product and variant fields and allows color
+measurement methods to evolve independently.
 
 Never overwrite a completed raw run. Start a new run so price, availability,
 formula, and catalog changes remain observable over time. Historical schema-v1
