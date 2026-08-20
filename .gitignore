@@ -6,6 +6,7 @@ __pycache__/
 .env
 *.tmp
 *.log
+*.ini
 
 # Scrape outputs can be large and are reproducible. Keep directory documentation.
 data/raw/*/*/
