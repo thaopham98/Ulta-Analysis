@@ -1,4 +1,4 @@
-# Ulta Beauty Product Data & Cosmetic Swatch Color Analysis
+# <img width="50" height="50" alt="image" src="https://github.com/user-attachments/assets/13476f70-290d-44d8-aa4e-248036244c63" /> Ulta Beauty Product Data & Cosmetic Swatch Color Analysis
 
 An end-to-end Python data engineering and image-processing project for
 collecting, preparing, and analyzing cosmetic product data from Ulta Beauty.
