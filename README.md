@@ -240,7 +240,7 @@ rebuilt from the CSV inputs. The same Plotly figure can later move into Dash
 when color clustering, nearest-shade selection, and ingredient filters require
 server-backed interactions.
 
-![Feature 1: Color Map](.\images\feature_1_color_map.png)
+![Feature 1: Color Map](images/feature_1_color_map.png)
 
 ## Encoding policy
 
