@@ -107,6 +107,56 @@ is retained. Row-level `observed_at` is not used: the run's `started_at` and
 `variant_without_ingredients_count` in the manifest makes missing ingredient
 content visible instead of silently pretending it was collected.
 
+## Cleaning
+
+### Basic Cleaning 
+- Removing known discontinued or no longer carried products on [Ulta](ulta.com).
+- Handling whitespaces and incorrect data
+
+The script is in `src/ulta_analysis/cleaning/basic_cleaning.py`
+
+CLI to run the pipeline, remember to replace the `<RUN_ID>`:
+
+```powershell
+ulta-clean-basic `
+  --products "data/01_raw/blush/<RUN_ID>/products.csv" `
+  --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
+  --output-dir "data/02_temporary/<blush>/basic_cleaned"
+```
+
+You can edit where to input and output the datasets by changing the input and output paths.
+
+### Fill Missing Sizes
+
+There are many incorrect data in `size_text`, this step help fixing a portion of those errors by using size map and old datasets. Only `size_text` of mono-color blushes are filled and excluding products either came in sets or newly added on [Ulta](ulta.com).
+- `\Ulta-Analysis\data\02_processed\test\blushes\cleaned\cleaned_single_blush.csv` has been renamed and moved to `\Ulta-Analysis\data\reference\size\ulta_cleaned_single_blush.csv`
+
+- This cleaned dataset is the referenced to clean some missing values of size.
+
+```powershell
+python -m ulta_analysis.cleaning.cli `
+  --products "data/01_raw/blush/<RUN_ID>/products.csv" `
+  --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
+  --size-reference "data/reference/size/cleaned_single_blush.csv" `
+  --output-dir "data/02_temp/blushes/<RUN_ID>/basic_clean"
+```
+
+### Classification
+
+Classifying blushes into different classes based on historical data:
+|Class | Product|
+|--|--|
+|0 | product with NO swatch_image_url|
+|1 | Mono-color |
+|2 | Multi-colors but they're in same color family|
+|3 | Pallets and set which large variaties|
+
+```powershell
+python -m ulta_analysis.classification.cli `
+  --temp-dir "data/02_temp/blush/20260724T001508Z" `
+  --output-dir "data/03_color_analysis/blush/20260724T001508Z"
+```
+
 ## Swatch color extraction
 
 Color extraction is a separate, resumable processing stage. It does not change
@@ -114,14 +164,14 @@ the scraped or prepared variant dataset. The current blush input contains 1,365
 unique color SKUs with 1,365 unique Ulta swatch-image URLs:
 
 ```text
-data/processed_data/test/blushes/single_color_swatch_image.csv
+data/02_temp/test/blushes/single_color_swatch_image.csv
 ```
 
 Start with a five-row verification run:
 
 ```powershell
 python scripts/extract_swatch_colors.py `
-  --input "data/processed_data/test/blushes/single_color_swatch_image.csv" `
+  --input "data/02_temp/blushes/single_color_swatch_image.csv" `
   --output "data/interim/blush/swatch_colors_sample.csv" `
   --limit 5
 ```
@@ -130,8 +180,16 @@ Then use a new output path for the complete dataset:
 
 ```powershell
 python scripts/extract_swatch_colors.py `
-  --input "data/processed_data/test/blushes/single_color_swatch_image.csv" `
+  --input "data/02_temp/test/blushes/single_color_swatch_image.csv" `
   --output "data/interim/blush/swatch_colors.csv"
+```
+
+Testing 3:
+
+```powershell
+python scripts/extract_swatch_colors.py `
+--input "data/03_color_analysis/blush/20260724T001508Z/variants.csv" `                  
+--output "data/03_color_analysis/blush/20260724T001508Z/swatch_colors.csv"
 ```
 
 The command checkpoints every 25 attempted images and resumes from an existing
