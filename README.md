@@ -124,29 +124,32 @@ src/ulta_analysis/cleaning/basic_cleaning.py
 CLI to run the pipeline, remember to replace the `<RUN_ID>`:
 
 ```powershell
-ulta-clean-basic `
+python -m ulta_analysis.cleaning.cli `
   --products "data/01_raw/blush/<RUN_ID>/products.csv" `
   --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
-  --output-dir "data/02_temp/<blush>/basic_cleaned"
+  --size-reference "data/reference/size/ulta_cleaned_single_blush.csv" `
+  --output-dir "data/02_temp/blush/<RUN_ID>" `
+  --color-output-dir "data/03_color_analysis/blush/<RUN_ID>"
 ```
 
 You can edit where to input and output the datasets by changing the input and output paths.
 
 ### Fill Missing Sizes
 
-There are many incorrect data in `size_text`, this step help fixing a portion of those errors by using size map and old datasets. Only `size_text` of mono-color blushes are filled and excluding products either came in sets or newly added on [Ulta](ulta.com).
-- `\Ulta-Analysis\data\02_processed\test\blushes\cleaned\cleaned_single_blush.csv` has been renamed and moved to `\Ulta-Analysis\data\reference\size\ulta_cleaned_single_blush.csv`
+Some `size_text` values are missing or invalid. This stage attempts to fill
+them using another SKU from the same product, a historical reference dataset,
+`SIZE_MAP_METRIC`, and `SIZE_MAP_OZ`. Values that cannot be resolved remain
+missing and are recorded in a separate size-audit CSV.
 
-- This cleaned dataset is the referenced to clean some missing values of size.
+The historical reference dataset was moved from:
 
-```powershell
-python -m ulta_analysis.cleaning.cli `
-  --products "data/01_raw/blush/<RUN_ID>/products.csv" `
-  --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
-  --size-reference "data/reference/size/cleaned_single_blush.csv" `
-  --output-dir "data/02_temp/blushes/<RUN_ID>/basic_clean" `
-  --color-output-dir "data/03_color_analysis/blush/<RUN_ID>
-```
+`data/02_processed/test/blushes/cleaned/cleaned_single_blush.csv`
+
+to:
+
+`data/reference/size/ulta_cleaned_single_blush.csv`
+
+This stage is included in the complete cleaning pipeline command above.
 
 For example:
 ```powershell
@@ -177,11 +180,11 @@ python -m ulta_analysis.classification.cli `
 ## Swatch color extraction
 
 Color extraction is a separate, resumable processing stage. It does not change
-the scraped or prepared variant dataset. The current blush input contains 1,365
-unique color SKUs with 1,365 unique Ulta swatch-image URLs:
+the scraped or prepared variant dataset. The input is the class-1 `variants.csv`
+produced by the preparation or classification pipeline:
 
 ```text
-data/02_temp/test/blushes/single_color_swatch_image.csv
+data/03_color_analysis/blush/<RUN_ID>/variants.csv
 ```
 
 Start with a five-row verification run:
@@ -225,12 +228,12 @@ measure the physical cosmetic, its pigment formula, lighting behavior, or its
 appearance on different skin tones.
 
 ## Interactive blush color map
+> This section documents the previous implementation and will be updated during the color-map redesign.
 
 Feature 1 is generated as a self-contained HTML report. It needs no database,
 GPU, web server, or Conda-specific setup; the project `.venv` and any modern
 browser are sufficient.
 
-### Legend
 ```powershell
 python scripts/build_color_map.py `
   --variants "data/processed_data/test/blushes/cleaned/cleaned_single_blush.csv" `
