@@ -67,7 +67,7 @@ than their default paths. Resume an interrupted v2 run with:
 ```powershell
 python scripts/scrape_ulta.py `
   --collection blush `
-  --resume-run "data/raw/blush/20260723T120000Z"
+  --resume-run "data/01_raw/blush/20260723T120000Z"
 ```
 
 ## Raw-data format (schema v2)
@@ -75,7 +75,7 @@ python scripts/scrape_ulta.py `
 Each execution creates:
 
 ```text
-data/raw/{collection}/{run_id}/
+data/01_raw/{collection}/{run_id}/
   run_manifest.json
   collection_products.csv
   products.csv
@@ -110,10 +110,16 @@ content visible instead of silently pretending it was collected.
 ## Cleaning
 
 ### Basic Cleaning 
-- Removing known discontinued or no longer carried products on [Ulta](ulta.com).
-- Handling whitespaces and incorrect data
+- Removes known discontinued products and SKUs.
+- Removes products when all their variants are out of stock.
+- Normalizes whitespace and non-breaking spaces.
+- Converts empty strings to missing values.
+- Handles known invalid values in size_text.
 
-The script is in `src/ulta_analysis/cleaning/basic_cleaning.py`
+The implementation script is in:
+```
+src/ulta_analysis/cleaning/basic_cleaning.py
+```
 
 CLI to run the pipeline, remember to replace the `<RUN_ID>`:
 
@@ -121,7 +127,7 @@ CLI to run the pipeline, remember to replace the `<RUN_ID>`:
 ulta-clean-basic `
   --products "data/01_raw/blush/<RUN_ID>/products.csv" `
   --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
-  --output-dir "data/02_temporary/<blush>/basic_cleaned"
+  --output-dir "data/02_temp/<blush>/basic_cleaned"
 ```
 
 You can edit where to input and output the datasets by changing the input and output paths.
@@ -138,18 +144,29 @@ python -m ulta_analysis.cleaning.cli `
   --products "data/01_raw/blush/<RUN_ID>/products.csv" `
   --variants "data/01_raw/blush/<RUN_ID>/variants.csv" `
   --size-reference "data/reference/size/cleaned_single_blush.csv" `
-  --output-dir "data/02_temp/blushes/<RUN_ID>/basic_clean"
+  --output-dir "data/02_temp/blushes/<RUN_ID>/basic_clean" `
+  --color-output-dir "data/03_color_analysis/blush/<RUN_ID>
 ```
 
+For example:
+```powershell
+python -m ulta_analysis.cleaning.cli `
+  --products "data/01_raw/blush/20260724T001508Z/products.csv" `
+  --variants "data/01_raw/blush/20260724T001508Z/variants.csv" `
+  --size-reference "data/reference/size/ulta_cleaned_single_blush.csv" `
+  --output-dir "data/02_temp/blush/20260724T001508Z" `
+  --color-output-dir "data/03_color_analysis/blush/20260724T001508Z"
+  ```
 ### Classification
 
 Classifying blushes into different classes based on historical data:
 |Class | Product|
 |--|--|
-|0 | product with NO swatch_image_url|
+|0 |  No usable swatch image|
 |1 | Mono-color |
-|2 | Multi-colors but they're in same color family|
-|3 | Pallets and set which large variaties|
+|2 | Multiple colors in the same color family|
+|3 | Palettes and sets containing varied colors|
+|Missing | New product requiring classification |
 
 ```powershell
 python -m ulta_analysis.classification.cli `
@@ -171,8 +188,8 @@ Start with a five-row verification run:
 
 ```powershell
 python scripts/extract_swatch_colors.py `
-  --input "data/02_temp/blushes/single_color_swatch_image.csv" `
-  --output "data/interim/blush/swatch_colors_sample.csv" `
+  --input "data/03_color_analysis/blush/<RUN_ID>/variants.csv" `
+  --output "data/03_color_analysis/blush/<RUN_ID>/swatch_colors_sample.csv" `
   --limit 5
 ```
 
@@ -180,16 +197,8 @@ Then use a new output path for the complete dataset:
 
 ```powershell
 python scripts/extract_swatch_colors.py `
-  --input "data/02_temp/test/blushes/single_color_swatch_image.csv" `
-  --output "data/interim/blush/swatch_colors.csv"
-```
-
-Testing 3:
-
-```powershell
-python scripts/extract_swatch_colors.py `
---input "data/03_color_analysis/blush/20260724T001508Z/variants.csv" `                  
---output "data/03_color_analysis/blush/20260724T001508Z/swatch_colors.csv"
+  --input "data/03_color_analysis/blush/20260724T001508Z/variants.csv" `                  
+  --output "data/03_color_analysis/blush/20260724T001508Z/swatch_colors.csv"
 ```
 
 The command checkpoints every 25 attempted images and resumes from an existing
@@ -221,6 +230,7 @@ Feature 1 is generated as a self-contained HTML report. It needs no database,
 GPU, web server, or Conda-specific setup; the project `.venv` and any modern
 browser are sufficient.
 
+### Legend
 ```powershell
 python scripts/build_color_map.py `
   --variants "data/processed_data/test/blushes/cleaned/cleaned_single_blush.csv" `
